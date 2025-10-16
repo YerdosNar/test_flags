@@ -54,7 +54,7 @@ compile() {
 }
 
 generate_result_file() {
-    local min_time=1e9
+    local min_time=1000000.0
     local min_flag="no flag"
     local result_file="result.txt"
 
@@ -82,6 +82,7 @@ generate_result_file() {
         if (( $(echo "$sanitized_time < $min_time" | bc -l) )); then
             min_time=$sanitized_time
             min_flag="$flag"
+            info "Updated MIN_TIME to $min_time MIN_FLAG to $min_flag"
         fi
 
         printf "|%-30s | %-34s|\n" "$flag" "$raw_time_output" >> "$result_file"
@@ -99,14 +100,14 @@ generate_result_file() {
 main() {
     banner "🚀 GCC Optimization Flag Benchmark"
 
-    # if [[ ! -d TEMP_TEST_DIR ]]; then
-    #     info "Cloning GitHub repo..."
-    #     git clone https://github.com/YerdosNar/test_flags.git
-    #     mkdir TEMP_TEST_DIR
-    #     mv test_flags/* TEMP_TEST_DIR/
-    #     rm -rf test_flags
-    #     success "Repository cloned into TEMP_TEST_DIR"
-    # fi
+    if [[ ! -d TEMP_TEST_DIR ]]; then
+        info "Cloning GitHub repo..."
+        git clone https://github.com/YerdosNar/test_flags.git
+        mkdir TEMP_TEST_DIR
+        mv test_flags/* TEMP_TEST_DIR/
+        rm -rf test_flags
+        success "Repository cloned into TEMP_TEST_DIR"
+    fi
 
     info "Cleaning up previous results"
     clean_up
