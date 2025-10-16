@@ -93,14 +93,11 @@ check_packages() {
 }
 
 read_set_dimension() {
-    read -p "Enter rows [default=1500]: " ROWS
-    ROWS=${ROWS:-1500}
-    read -p "Enter cols [default=1500]: " COLS
-    COLS=${COLS:-1500}
+    read -p "Enter size [default=1500]: " SIZE
+    SIZE=${SIZE:-1500}
 
-    sed -i "s/^#define ROWS .*/#define ROWS $ROWS/" matrix_bench.c
-    sed -i "s/^#define COLS .*/#define COLS $COLS/" matrix_bench.c
-    info "Matrix dimensions set to ${BLUE}${ROWS}x${COLS}${NC}"
+    sed -i "s/^#define SIZE .*/#define SIZE $SIZE/" matrix_bench.c
+    info "Matrix dimensions set to ${BLUE}${SIZE}x${SIZE}${NC}"
 }
 
 clean_up() {
@@ -123,7 +120,7 @@ generate_result_file() {
 
     info "Generating result file: $result_file"
     {
-        echo "Matrix Dimensions: $ROWS x $COLS"
+        echo "Matrix Dimensions: $SIZE x $SIZE"
         echo "+-------------------------------+-----------------------------------+"
         printf "|%-30s | %-34s|\n" "Compiler Flags" "Execution Time"
         echo "+-------------------------------+-----------------------------------+"
@@ -145,7 +142,7 @@ generate_result_file() {
         if (( $(echo "$sanitized_time < $min_time" | bc -l) )); then
             min_time=$sanitized_time
             min_flag="$flag"
-            info "Updated MIN_TIME to $min_time MIN_FLAG to $min_flag"
+            info "Updated ${GREEN}MIN_TIME${NC} to $min_time ${GREEN}MIN_FLAG${NC} to $min_flag"
         fi
 
         printf "|%-30s | %-34s|\n" "$flag" "$raw_time_output" >> "$result_file"
@@ -168,16 +165,17 @@ main() {
     banner "🚀 GCC Optimization Flag Benchmark"
     check_packages
 
-    if [[ ! -d TEMP_TEST_DIR || $(basename $PWD) != "TEMP_TEST_DIR" ]]; then
+    if [ "$(basename $PWD)" == "TEMP_TEST_DIR" ]; then
+        info "Skipped cloning"
+    else
         info "Cloning GitHub repo..."
         git clone --depth=1 https://github.com/YerdosNar/test_flags.git
         mkdir TEMP_TEST_DIR
         mv test_flags/* TEMP_TEST_DIR/
         rm -rf test_flags
         success "Repository cloned into TEMP_TEST_DIR"
+        cd TEMP_TEST_DIR
     fi
-
-    cd TEMP_TEST_DIR
 
     info "Cleaning up previous results"
     clean_up
