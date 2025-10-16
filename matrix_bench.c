@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ROWS 100
-#define COLS 100
+#define SIZE 100
 
 // A simple struct to hold matrix data and dimensions
 typedef struct {
@@ -15,15 +14,15 @@ typedef struct {
 // Allocates memory for a matrix
 Matrix create_matrix() {
     Matrix m;
-    m.rows = ROWS;
-    m.cols = COLS;
-    m.data = (double **)malloc(ROWS * sizeof(double *));
+    m.rows = SIZE;
+    m.cols = SIZE;
+    m.data = (double **)malloc(SIZE * sizeof(double *));
     if (m.data == NULL) {
         perror("Failed to allocate memory for matrix rows");
         exit(EXIT_FAILURE);
     }
-    for (int i = 0; i < ROWS; i++) {
-        m.data[i] = (double *)malloc(COLS * sizeof(double));
+    for (int i = 0; i < SIZE; i++) {
+        m.data[i] = (double *)malloc(SIZE * sizeof(double));
         if (m.data[i] == NULL) {
             perror("Failed to allocate memory for matrix columns");
             exit(EXIT_FAILURE);
