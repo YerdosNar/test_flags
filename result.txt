@@ -1,0 +1,20 @@
+Matrix Dimensions: 100 x 100
++-------------------------------+-----------------------------------+
+|Compiler Flags                 | Execution Time                    |
++-------------------------------+-----------------------------------+
+|-O0                            | Execution time: 0.00331 seconds   |
+|-O0 -march=native              | Execution time: 0.00334 seconds   |
+|-O1                            | Execution time: 0.00194 seconds   |
+|-O1 -march=native              | Execution time: 0.00192 seconds   |
+|-O2                            | Execution time: 0.00081 seconds   |
+|-O2 -march=native              | Execution time: 0.00078 seconds   |
+|-O3                            | Execution time: 0.00074 seconds   |
+|-O3 -march=native              | Execution time: 0.00073 seconds   |
+|-O3 -ffast-math                | Execution time: 0.00043 seconds   |
+|-O3 -ffast-math -march=native  | Execution time: 0.00042 seconds   |
+|-Ofast                         | Execution time: 0.00043 seconds   |
+|-O3 -march=native -fopenmp     | Execution time: 0.00072 seconds   |
++-------------------------------+-----------------------------------+
+|Best flag                      | none                              |
+|Best time                      | 1e9 seconds                       |
++-------------------------------+-----------------------------------+
