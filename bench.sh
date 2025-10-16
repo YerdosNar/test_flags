@@ -41,7 +41,7 @@ read_set_dimension() {
 }
 
 clean_up() {
-    rm -f matrix_bench Assembly_codes/*.txt 2>/dev/null || true
+    rm -rf matrix_bench Assembly_codes 2>/dev/null || true
 }
 
 compile() {
@@ -109,8 +109,11 @@ main() {
         success "Repository cloned into TEMP_TEST_DIR"
     fi
 
+    cd TEMP_TEST_DIR
+
     info "Cleaning up previous results"
     clean_up
+    mkdir Assembly_codes
 
     read_set_dimension
     info "Starting Matrix Multiplication Benchmark..."
