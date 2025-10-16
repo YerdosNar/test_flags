@@ -29,6 +29,68 @@ warn()    { echo -e "${YELLOW}[!]${NC} $1"; }
 error()   { echo -e "${RED}[✗]${NC} $1" >&2; }
 banner()  { echo -e "${CYAN}${BOLD}$1${NC}"; }
 
+detect_os() {
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        echo "$ID"
+    else
+        echo "unknown"
+    fi
+}
+
+uninstall() {
+    info "Uninstalling benchmark test directory"
+    echo -e "Press ${YELLOW}ENTER${NC} to proceed"
+    read
+    find ~ -type d -name "TEMP_TEST_DIR" -exec rm -rf {} + 2>/dev/null || true
+    success "Removed TEMP_TEST_DIR (if ever existed)"
+    exit 0
+}
+
+install() {
+    local packages=("$@")
+    local os_id=$(detect_os)
+    case "$ID" in
+        arch)
+            sudo pacman -S --noconfirm "${packages[@]}" ;;
+        ubuntu|kali|debian)
+            sudo apt update && sudo apt install -y "${packages[@]}" ;;
+        fedora)
+            sudo yum install -y "${packages[@]}" ;;
+        *)
+            error "Sorry, Could not determine OS..."
+            exit 1 ;;
+    esac
+}
+
+check_packages() {
+    info "Checking packages..."
+    local missing=()
+    for pac in bc sed gcc;
+    do
+        if ! command -v "$pac" &>/dev/null; then
+            missing+=("$pac")
+        else
+            success "$pac exists!"
+        fi
+    done
+
+    if (( ${#missing[@]} > 0 )); then
+        error "Missing required packages: ${RED}${missing[*]}${NC}"
+        read -p "Install [Y/n]: " install_pac
+        install_pac=${install_pac:-Y}
+        if [[ "$install_pac" =~ ^[Yy]$ ]]; then
+            install ${missing[*]}
+        else
+            warn "Install manually to run this script"
+            uninstall
+            exit 1
+        fi
+    else
+        success "All packages are installed"
+    fi
+}
+
 read_set_dimension() {
     read -p "Enter rows [default=1500]: " ROWS
     ROWS=${ROWS:-1500}
@@ -98,9 +160,14 @@ generate_result_file() {
 }
 
 main() {
-    banner "🚀 GCC Optimization Flag Benchmark"
+    if [ "$1" == "uninstall" ]; then
+        uninstall
+    fi
 
-    if [[ ! -d TEMP_TEST_DIR ]]; then
+    banner "🚀 GCC Optimization Flag Benchmark"
+    check_packages
+
+    if [[ ! -d TEMP_TEST_DIR || $(basename $PWD) != "TEMP_TEST_DIR" ]]; then
         info "Cloning GitHub repo..."
         git clone https://github.com/YerdosNar/test_flags.git
         mkdir TEMP_TEST_DIR
