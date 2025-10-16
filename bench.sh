@@ -42,6 +42,7 @@ uninstall() {
     info "Uninstalling benchmark test directory"
     echo -e "Press ${YELLOW}ENTER${NC} to proceed"
     read
+    warn "Uninstalling..."
     find ~ -type d -name "TEMP_TEST_DIR" -exec rm -rf {} + 2>/dev/null || true
     success "Removed TEMP_TEST_DIR (if ever existed)"
     exit 0
@@ -160,7 +161,7 @@ generate_result_file() {
 }
 
 main() {
-    if [ "$1" == "uninstall" ]; then
+    if [[ $# -eq 1 && "$1" == "uninstall" ]]; then
         uninstall
     fi
 
@@ -169,7 +170,7 @@ main() {
 
     if [[ ! -d TEMP_TEST_DIR || $(basename $PWD) != "TEMP_TEST_DIR" ]]; then
         info "Cloning GitHub repo..."
-        git clone https://github.com/YerdosNar/test_flags.git
+        git clone --depth=1 https://github.com/YerdosNar/test_flags.git
         mkdir TEMP_TEST_DIR
         mv test_flags/* TEMP_TEST_DIR/
         rm -rf test_flags
